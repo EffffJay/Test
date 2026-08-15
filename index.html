@@ -64,7 +64,7 @@
 
     <!-- Color Wheel Gradient Box Panel -->
     <div class="panel">
-        <div class="section-title">1. Real-time Color Picker (HSV)</div>
+        <div class="section-title">1. Real-time Color Picker</div>
         <canvas id="colorCanvas"></canvas>
         <div class="slider-group">
             <span>Brightness:</span>
@@ -122,12 +122,12 @@
         let activeRGB = { r: 255, g: 255, b: 255 };
         let selectedPixels = new Set();
 
-        // FIXED: Filled in your asymmetric serpentine layout indices correctly to stop syntax errors
+        // Exact matrix row config indices loaded natively
         const gridSetup = {
-            r1: [0, 1, 2, 3],
-            r2: [10, 9, 8, 7, 6, 5, 4],
-            r3: [11, 12, 13, 14, 15, 16, 17, 18],
-            r4: [25, 24, 23, 22, 21, 20, 19],
+            r1:,
+            r2:,
+            r3:,
+            r4:,
             r5: [26, 27, 28, 29]
         };
 
@@ -195,96 +195,18 @@
         async function tx(arr) { if(txChar) await txChar.writeValue(new Uint8Array(arr)); }
         function sendBrightness(v) { tx([100, parseInt(v)]); }
 
-    const SUUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
-    const CUUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
-    let txChar = null;
-    let activeRGB = { r: 255, g: 255, b: 255 };
-    let selectedPixels = new Set();
-
-    // Mapping configuration tracking arrays matching your exact layout shape
-    const gridSetup = {
-        r1:,
-        r2:,
-        r3:,
-        r4:,
-        r5: [26, 27, 28, 29]
-    };
-
-    // Render Matrix nodes into DOM layout
-    Object.keys(gridSetup).forEach(rowId => {
-        const container = document.getElementById(rowId);
-        gridSetup[rowId].forEach(index => {
-            const d = document.createElement('div');
-            d.className = 'pixel';
-            d.id = 'p' + index;
-            d.innerText = index;
-            d.onclick = () => togglePixel(index);
-            container.appendChild(d);
-        });
-    });
-
-    // Initialize Spectrum Saturation Canvas Box
-    const canvas = document.getElementById('colorCanvas');
-    const ctx = canvas.getContext('2d');
-    function drawCanvasGradients() {
-        let hG = ctx.createLinearGradient(0, 0, canvas.width, 0);
-        hG.addColorStop(0, '#f00'); hG.addColorStop(0.17, '#f0f'); hG.addColorStop(0.33, '#00f');
-        hG.addColorStop(0.5, '#0cc'); hG.addColorStop(0.67, '#0f0'); hG.addColorStop(0.83, '#ff0'); hG.addColorStop(1, '#f00');
-        ctx.fillStyle = hG; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        let vG = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        vG.addColorStop(0, 'rgba(255,255,255,1)'); vG.addColorStop(0.05, 'rgba(255,255,255,0.8)');
-        vG.addColorStop(0.5, 'rgba(255,255,255,0)'); vG.addColorStop(0.95, 'rgba(0,0,0,0.8)'); vG.addColorStop(1, 'rgba(0,0,0,1)');
-        ctx.fillStyle = vG; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    canvas.width = 410; canvas.height = 160; drawCanvasGradients();
-
-    canvas.addEventListener('click', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-        const p = ctx.getImageData(x, y, 1, 1).data;
-        activeRGB = { r: p[0], g: p[1], b: p[2] };
-    });
-
-    function togglePixel(i) {
-        const el = document.getElementById('p' + i);
-        if(selectedPixels.has(i)) { selectedPixels.delete(i); el.classList.remove('selected'); }
-        else { selectedPixels.add(i); el.classList.add('selected'); }
-    }
-    function selectAll() { for(let i=0; i<30; i++) { selectedPixels.add(i); document.getElementById('p'+i).classList.add('selected'); }}
-    function clearSelection() { selectedPixels.clear(); document.querySelectorAll('.pixel').forEach(p=>p.classList.remove('selected')); }
-
-    // BLE Core Engine Transmission Blocks
-    async function connect() {
-        document.getElementById('status').innerText = "Connecting...";
-        try {
-            const dev = await navigator.bluetooth.requestDevice({ filters: [{ name: 'ESP32_LED_Matrix' }], optionalServices: [SUUID] });
-            const srv = await dev.gatt.connect();
-            const svc = await srv.getPrimaryService(SUUID);
-            txChar = await svc.getCharacteristic(CUUID);
-            document.getElementById('status').innerText = "Status: Connected to Matrix Core";
-            document.getElementById('status').style.color = "#00e676";
-            document.getElementById('connBtn').style.display = "none";
-        } catch (err) {
-            console.error(err);
-            document.getElementById('status').innerText = "Status: Connection Failed";
-            document.getElementById('status').style.color = "#ff1744";
-        }
-    }
-
-    async function tx(arr) { if(txChar) await txChar.writeValue(new Uint8Array(arr)); }
-    function sendBrightness(v) { tx([100, parseInt(v)]); }
-    
-    // BINDING RESTORED: These methods process your selected text block smoothly now
-    function clearMatrix() { tx([101, 0]); clearSelection(); document.querySelectorAll('.pixel').forEach(p=>p.style.backgroundColor='#252830'); }
-    function sendAnim(id) { tx([102, id, activeRGB.r, activeRGB.g, activeRGB.b]); }
-    function sendNumber(num) { tx([103, num, activeRGB.r, activeRGB.g, activeRGB.b]); }
-
-    function applyToSelected() {
-        if(selectedPixels.size === 0) return;
-        let packet = [200, activeRGB.r, activeRGB.g, activeRGB.b];
-        selectedPixels.forEach(idx => {
-            packet.push(idx);
-            document.getElementById('p' + idx).style.backgroundColor = `rgb(${activeRGB.r},${activeRGB.g},${activeRGB.b})`;
-        });
-        tx(packet);
-    }
+        function clearMatrix() { tx([101, 0]); clearSelection();
+ document.querySelectorAll('.pixel').forEach(p=>p.style.backgroundColor='#252830'); }
+ function sendAnim(id) { tx([102, id, activeRGB.r, activeRGB.g, activeRGB.b]); }
+ function sendNumber(num) { tx([103, num, activeRGB.r, activeRGB.g, activeRGB.b]); }
+ 
+ function applyToSelected()
+ {if(selectedPixels.size === 0) return;
+ let packet = [200, activeRGB.r, activeRGB.g, activeRGB.b];
+ selectedPixels.forEach(idx => 
+ {packet.push(idx);
+ document.getElementById('p' + idx).style.backgroundColor = rgb(${activeRGB.r},
+ ${activeRGB.g},${activeRGB.b});
+ });
+ tx(packet);
+ }
