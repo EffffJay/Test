@@ -53,7 +53,7 @@
         
         /* Digit selector list */
         .digit-strip { display: flex; justify-content: space-between; margin-top: 5px; gap: 4px; }
-        .digit-btn { background: #232730; padding: 6px 10px; border-radius: 4px; font-size: 12px; flex: 1;}
+        .digit-btn { background: #232730; padding: 6px 10px; border-radius: 4px; font-size: 12px; flex: 1; color: white; border: 1px solid #3c424e; cursor: pointer;}
     </style>
 </head>
 <body>
@@ -122,7 +122,7 @@
         let activeRGB = { r: 255, g: 255, b: 255 };
         let selectedPixels = new Set();
 
-        // Map configuration data arrays matching your exact layout shape
+        // FIXED: Filled in your asymmetric serpentine layout indices correctly to stop syntax errors
         const gridSetup = {
             r1: [0, 1, 2, 3],
             r2: [10, 9, 8, 7, 6, 5, 4],
@@ -157,7 +157,6 @@
             vG.addColorStop(0.5, 'rgba(255,255,255,0)'); vG.addColorStop(0.95, 'rgba(0,0,0,0.8)'); vG.addColorStop(1, 'rgba(0,0,0,1)');
             ctx.fillStyle = vG; ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
-        window.addEventListener('resize', () => { canvas.width = canvas.parentElement.offsetWidth - 30; drawCanvasGradients(); });
         canvas.width = 410; canvas.height = 160; drawCanvasGradients();
 
         canvas.addEventListener('click', (e) => {
@@ -187,6 +186,7 @@
                 document.getElementById('status').style.color = "#00e676";
                 document.getElementById('connBtn').style.display = "none";
             } catch (err) {
+                console.error(err);
                 document.getElementById('status').innerText = "Status: Connection Failed";
                 document.getElementById('status').style.color = "#ff1744";
             }
